@@ -21,7 +21,6 @@ export class AuthGuard implements CanActivate {
     const request: Request = context.switchToHttp().getRequest();
     // Extracting the authorization header which contains the JWT token
     const { authorization } = request.headers;
-    console.log(request.headers);
     // Extracting token from the authorization header
     const token = authorization.split(' ')[1];
 

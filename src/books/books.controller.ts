@@ -17,6 +17,7 @@ import { UpdateBookDto } from './dto/update-book.dto';
 import { GetBookFilterDto } from './dto/get-book-filter.dto';
 import { LanguageValidationPipe } from '../common/pipes/language-validation/language-validation.pipe';
 import { AuthGuard } from '../auth/auth.guard';
+import { CurrentUser } from '../auth/decorator/current-user.decorator';
 
 @UseGuards(AuthGuard)
 @Controller('books')
@@ -30,7 +31,11 @@ export class BooksController {
   }
 
   @Get()
-  findAll(@Query() filterDto: GetBookFilterDto) {
+  findAll(
+    @Query() filterDto: GetBookFilterDto,
+    @CurrentUser('email') userInfo,
+  ) {
+    console.log(userInfo);
     return this.booksService.findBooks(filterDto);
   }
 
