@@ -37,7 +37,7 @@ export class AuthService {
       console.log(error);
       if (error.code === '23505') {
         // "23505" is a unique constraint violation in PostgreSQL.
-        throw new ConflictException('Email already in use.');
+        throw new ConflictException('Email already in use');
       }
       throw error;
     }

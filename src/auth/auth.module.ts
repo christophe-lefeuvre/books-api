@@ -9,8 +9,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 @Module({
   controllers: [AuthController],
   providers: [AuthService],
-  exports: [JwtModule],
+  exports: [JwtModule, ConfigModule],
   imports: [
+    ConfigModule,
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
