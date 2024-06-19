@@ -5,7 +5,7 @@ export const CurrentUser = createParamDecorator(
   (field: keyof CurrentUserData | undefined, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
     const user: CurrentUserData = request.user;
-
+    console.log(user);
     return field ? user[field] : user;
   },
 );

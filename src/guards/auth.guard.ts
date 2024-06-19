@@ -7,16 +7,39 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
+import { Reflector } from '@nestjs/core';
+import { Role } from '../auth/entities/user.entity';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   // Injecting necessary services: JwtService for token verification, ConfigService for retrieving JWT secret
   constructor(
-    private jwtService: JwtService,
     private configService: ConfigService,
+    private jwtService: JwtService,
+    private reflector: Reflector,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const classRoles = this.reflector.get<Role[]>('roles', context.getClass());
+    const methodRoles = this.reflector.get<Role[]>(
+      'roles',
+      context.getHandler(),
+    );
+
+    const overrideRoles = this.reflector.getAllAndOverride<Role[]>('roles', [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    const mergeRoles = this.reflector.getAllAndMerge<Role[]>('roles', [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    console.log('Class Roles:', classRoles);
+    console.log('Method Roles:', methodRoles);
+    console.log('Override Roles:', overrideRoles);
+    console.log('Merged Roles:', mergeRoles);
+
     // Retrieving the request object from the execution context
     const request: Request = context.switchToHttp().getRequest();
     // Extracting the authorization header which contains the JWT token
