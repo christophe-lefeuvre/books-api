@@ -24,6 +24,8 @@
 
 ## Description
 
+POC from https://petal.devpath.com/courses/building-a-backend-application-with-nestjs
+
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 ## Installation
@@ -31,6 +33,12 @@
 ```bash
 $ npm install
 ```
+
+Works with postgresql 
+```bash
+docker run --name postgresql-academy -e POSTGRES_PASSWORD=password -d postgres
+```
+You will have to create the database 'book_database'
 
 ## Running the app
 
