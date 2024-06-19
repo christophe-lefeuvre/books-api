@@ -14,6 +14,7 @@ import { User } from './auth/entities/user.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
+      isGlobal: true,
       envFilePath: `.${process.env.NODE_ENV}.env`,
       validationSchema: Joi.object({
         NODE_ENV: Joi.string().valid('dev', 'prod', 'test').default('dev'),
@@ -22,6 +23,8 @@ import { User } from './auth/entities/user.entity';
         DATABASE_USER: Joi.string().required(),
         DATABASE_PASSWORD: Joi.string().required(),
         DATABASE_NAME: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXPIRES_IN: Joi.number().required(),
       }),
     }),
     TypeOrmModule.forRootAsync({
@@ -38,9 +41,9 @@ import { User } from './auth/entities/user.entity';
         synchronize: true,
       }),
     }),
+    AuthModule,
     AuthorsModule,
     BooksModule,
-    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
