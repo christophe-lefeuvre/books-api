@@ -3,61 +3,63 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   ParseIntPipe,
   Patch,
   Post,
   Query,
   UseGuards,
-  UsePipes,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
-import { CreateBookDto } from './dto/create-book.dto';
-import { UpdateBookDto } from './dto/update-book.dto';
-import { GetBookFilterDto } from './dto/get-book-filter.dto';
-import { LanguageValidationPipe } from '../common/pipes/language-validation/language-validation.pipe';
-import { AuthGuard } from '../guards/auth.guard';
-import { CurrentUser } from '../decorator/current-user.decorator';
-import { Role } from '../auth/entities/user.entity';
+import { CreateBookDto } from 'src/books/dto/create-book.dto';
+import { UpdateBookDto } from 'src/books/dto/update-book.dto';
+import { GetBookFilterDto } from 'src/books/dto/get-book-filter.dto';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { Role } from 'src/auth/entities/user.entity';
+import { AccessControlGuard } from 'src/guards/access-control.guard';
 import { Roles } from '../decorator/roles.decorator';
-import { AccessControlGuard } from '../guards/access-control.guard';
 
-@Controller('books')
 @UseGuards(AuthGuard, AccessControlGuard)
+@Controller('books')
 export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+  private readonly logger = new Logger(BooksController.name);
 
-  @Delete(':id')
-  @Roles(Role.Admin)
-  deleteBook(@Param('id', ParseIntPipe) id: number) {
-    return this.booksService.deleteBook(id);
-  }
+  constructor(private readonly bookService: BooksService) {}
 
   @Get()
-  @Roles(Role.Admin, Role.Viewer)
-  findAll(
-    @Query() filterDto: GetBookFilterDto,
-    @CurrentUser('email') userInfo,
-  ) {
-    return this.booksService.findBooks(filterDto);
+  findAll(@Query() filterDto: GetBookFilterDto) {
+    this.logger.log(
+      `Fetching all books with filters: ${JSON.stringify(filterDto)}`,
+    );
+    return this.bookService.findBooks(filterDto);
+  }
+
+  @Post()
+  @Roles(Role.Admin)
+  create(@Body() body: CreateBookDto) {
+    this.logger.log(`Creating a new book: ${JSON.stringify(body)}`);
+    return this.bookService.createBook(body);
   }
 
   @Get(':id')
-  @Roles(Role.Admin, Role.Viewer)
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.booksService.findBookById(id);
+    this.logger.log(`Fetching book with ID: ${id}`);
+    return this.bookService.findBookById(id);
   }
 
   @Patch(':id')
   @Roles(Role.Admin)
-  update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateBookDto) {
-    return this.booksService.updateBook(id, body);
+  update(@Param('id') id: number, @Body() body: UpdateBookDto) {
+    this.logger.log(`Updating book with ID: ${id}`);
+    const book = this.bookService.updateBook(+id, body);
+    return book;
   }
 
-  @Post()
-  @UsePipes(LanguageValidationPipe)
+  @Delete(':id')
   @Roles(Role.Admin)
-  create(@Body() body: CreateBookDto) {
-    return this.booksService.createBook(body);
+  delete(@Param('id') id: string) {
+    this.logger.log(`Deleting book with ID: ${id}`);
+    return this.bookService.deleteBook(+id);
   }
 }

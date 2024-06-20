@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 
 declare const module: any;
 
@@ -12,6 +13,7 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+  app.useLogger(app.get(Logger));
   await app.listen(3000);
 
   if (module.hot) {
